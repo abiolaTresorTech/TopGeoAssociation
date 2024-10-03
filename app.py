@@ -14,7 +14,7 @@ import streamlit_ext as ste
 
 from sentence_transformers import SentenceTransformer, util
 
-# import faiss
+# import faiss 
 
 #import numpy as np
 
@@ -163,12 +163,12 @@ def main():
 
     # query = st.text_input("Enter a topic here:", placeholder="My Topic")
     uploaded_file_topic_desc = st.file_uploader("Upload topics and descriptions file", type=["csv"])
-    uploaded_file_geography = st.file_uploader("Choose geographies file", type=["csv"])
+    uploaded_file_geography = st.file_uploader("Upload geographies file", type=["csv"])
 
 
     if uploaded_file_topic_desc is not None and uploaded_file_geography is not None:
         df_topic_desc = pd.read_csv(uploaded_file_topic_desc)
-        df_geography = pd.read_csv(uploaded_file_topic_desc)
+        df_geography = pd.read_csv(uploaded_file_geography)
         expected_columns_topic_desc = ["Topic", "Description"]
         expected_columns_geography = ["Geography"]
         columns_are_checked_topic_desc = all([elt in df_topic_desc for elt in expected_columns_topic_desc ])
@@ -183,13 +183,13 @@ def main():
                 query = "Let's talk about this topic " + topic +". " + topics2desc[topic][0]
                 query_embeddings = model.encode([query], convert_to_tensor=True)
                 query_embeddings = util.normalize_embeddings(query_embeddings)
-                hits_for_stats = util.semantic_search(query_embeddings, corpus_embeddings, top_k = len(geographies))
+                hits_for_stats = util.semantic_search(query_embeddings, corpus_embeddings, top_k = len(geographies))[0]
                 topics = [topic for _ in hits_for_stats]
                 scored_geographies = [geographies[hit["corpus_id"]] for hit in hits_for_stats]
                 scores = [hit["score"] for hit in hits_for_stats]
                 output_topic2kw2score["Topic"].extend(topics)
                 output_topic2kw2score["Geography"].extend(scored_geographies)
-                scored_geographies["Score"].extend(scores)
+                output_topic2kw2score["Score"].extend(scores)
                 
             output_topic2kw2score_df = pd.DataFrame.from_dict(output_topic2kw2score)
             output_topic2kw2score_csv = convert_df_to_csv(output_topic2kw2score_df)

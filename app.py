@@ -18,6 +18,8 @@ from sentence_transformers import SentenceTransformer, util
 
 #import numpy as np
 
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 import pandas as pd
 
@@ -129,6 +131,14 @@ else:
     #keywords_embeddings = torch.from_numpy(np.load('/Users/abiolatresordjigui/DM/streamlit-apps/extracted_keywords_normalized_embeddings.npy'))
 st.success("Everything was set up successfully!")
 
+with st.expander("Methodology Explanation"):
+    st.write("""
+    We aim to link different topics to specific geographical areas by evaluating how closely related they are. 
+    To do this, we calculate a score that measures the connection between each topic and different regions. 
+    This score is based on how likely the topic and region appear together. 
+    Since embeddings are built based on cooccurence of words, we approach this problem computing
+    semantic similarities between geography regions and topics attached to their descriptions.
+    """)
 #@st.cache_data
 def convert_df_to_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
@@ -162,8 +172,8 @@ def convert_df_to_csv(df):
 def main():
 
     # query = st.text_input("Enter a topic here:", placeholder="My Topic")
-    uploaded_file_topic_desc = st.file_uploader("Upload topics and descriptions file", type=["csv"])
-    uploaded_file_geography = st.file_uploader("Upload geographies file", type=["csv"])
+    uploaded_file_topic_desc = st.file_uploader("Upload topics and descriptions file", type=["csv"], help="Upload a CSV file with at least two columns: 'Topic' and 'Description' spelled that same way.")
+    uploaded_file_geography = st.file_uploader("Upload geographies file", type=["csv"], help="Upload a CSV file with at least one column: 'TGeography' spelled that same way.")
 
 
     if uploaded_file_topic_desc is not None and uploaded_file_geography is not None:
@@ -193,6 +203,21 @@ def main():
                 
             output_topic2kw2score_df = pd.DataFrame.from_dict(output_topic2kw2score)
             output_topic2kw2score_csv = convert_df_to_csv(output_topic2kw2score_df)
+
+            heatmap_data = output_topic2kw2score_df.pivot(index='Geography', columns='Topic', values='Score')
+            plt.figure(figsize=(len(geographies)/3 , len(topics2desc)))
+            heatmap = sns.heatmap(heatmap_data, annot=True, cmap='coolwarm', annot_kws={"size": 5})
+            # plt.tight_layout()
+            plt.xticks(fontsize=5)  # Set x-axis (Topic) label font size
+            plt.yticks(fontsize=5) 
+
+            plt.xlabel('Topic', fontsize=8)  # Set x-axis title size
+            plt.ylabel('Geography', fontsize=8)
+            cbar = heatmap.collections[0].colorbar
+            cbar.ax.tick_params(labelsize=5)  
+            st.pyplot(plt)
+            # st.write("yooooo")
+            # plt.clf()
             ste.download_button(
             label="Download results as CSV",
             data=output_topic2kw2score_csv,

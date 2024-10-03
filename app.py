@@ -23,6 +23,8 @@ import seaborn as sns
 
 import pandas as pd
 
+import math as m
+
 # from google.cloud import storage
 # from google import cloud
 # from google.oauth2 import service_account
@@ -135,9 +137,9 @@ with st.expander("Methodology Explanation"):
     st.write("""
     We aim to link different topics to specific geographical areas by evaluating how closely related they are. 
     To do this, we calculate a score that measures the connection between each topic and different regions. 
-    This score is based on how likely the topic and region appear together. 
-    Since embeddings are built based on cooccurence of words, we approach this problem computing
-    semantic similarities between geography regions and topics attached to their descriptions.
+    This score is based on how likely the topic and region appear together, and it helps us understand which topics 
+    are most relevant to which areas. In the end, we generate scores for all regions, and these scores add up to 1, 
+    showing the relative importance of each region to the topic.
     """)
 #@st.cache_data
 def convert_df_to_csv(df):
@@ -188,15 +190,17 @@ def main():
             geographies = df_geography["Geography"].to_list()
             output_topic2kw2score = {"Topic":[], "Geography":[], "Score":[]}
             corpus_embeddings = model.encode(geographies,  convert_to_tensor=True)
-            corpus_embeddings = util.normalize_embeddings(corpus_embeddings)
+            # corpus_embeddings = util.normalize_embeddings(corpus_embeddings)
             for topic in topics2desc:
                 query = "Let's talk about this topic " + topic +". " + topics2desc[topic][0]
                 query_embeddings = model.encode([query], convert_to_tensor=True)
-                query_embeddings = util.normalize_embeddings(query_embeddings)
-                hits_for_stats = util.semantic_search(query_embeddings, corpus_embeddings, top_k = len(geographies))[0]
+                # query_embeddings = util.normalize_embeddings(query_embeddings)
+                hits_for_stats = util.semantic_search(query_embeddings, corpus_embeddings, top_k = len(geographies), score_function = util.dot_score)[0]
                 topics = [topic for _ in hits_for_stats]
                 scored_geographies = [geographies[hit["corpus_id"]] for hit in hits_for_stats]
                 scores = [hit["score"] for hit in hits_for_stats]
+                scores = [m.exp(score) for score in scores]
+                scores = [m/sum(scores) for m in scores]
                 output_topic2kw2score["Topic"].extend(topics)
                 output_topic2kw2score["Geography"].extend(scored_geographies)
                 output_topic2kw2score["Score"].extend(scores)

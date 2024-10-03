@@ -173,7 +173,7 @@ def main():
 
     # query = st.text_input("Enter a topic here:", placeholder="My Topic")
     uploaded_file_topic_desc = st.file_uploader("Upload topics and descriptions file", type=["csv"], help="Upload a CSV file with at least two columns: 'Topic' and 'Description' spelled that same way.")
-    uploaded_file_geography = st.file_uploader("Upload geographies file", type=["csv"], help="Upload a CSV file with at least one column: 'TGeography' spelled that same way.")
+    uploaded_file_geography = st.file_uploader("Upload geographies file", type=["csv"], help="Upload a CSV file with at least one column: 'Geography' spelled that same way.")
 
 
     if uploaded_file_topic_desc is not None and uploaded_file_geography is not None:

@@ -4,3 +4,4 @@ streamlit==1.38.0
 streamlit_ext==0.1.10
 matplotlib
 seaborn
+openpyxl

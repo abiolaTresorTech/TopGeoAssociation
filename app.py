@@ -176,8 +176,6 @@ def main():
     # query = st.text_input("Enter a topic here:", placeholder="My Topic")
     uploaded_file_topic_desc = st.file_uploader("Upload topics and descriptions file", type=["xlsx"], help="Upload a one sheet excel file with at least two columns: 'Topic' and 'Description' spelled that same way.")
     uploaded_file_geography = st.file_uploader("Upload geographies file", type=["xlsx"], help="Upload a one sheet excel file with at least one column: 'Geography' spelled that same way.")
-    st.table(uploaded_file_topic_desc)
-    st.table(uploaded_file_geography)
 
 
     if uploaded_file_topic_desc is not None and uploaded_file_geography is not None:

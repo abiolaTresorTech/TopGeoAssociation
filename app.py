@@ -174,13 +174,15 @@ def convert_df_to_csv(df):
 def main():
 
     # query = st.text_input("Enter a topic here:", placeholder="My Topic")
-    uploaded_file_topic_desc = st.file_uploader("Upload topics and descriptions file", type=["csv"], help="Upload a CSV file with at least two columns: 'Topic' and 'Description' spelled that same way.")
-    uploaded_file_geography = st.file_uploader("Upload geographies file", type=["csv"], help="Upload a CSV file with at least one column: 'Geography' spelled that same way.")
+    uploaded_file_topic_desc = st.file_uploader("Upload topics and descriptions file", type=["xlsx"], help="Upload a one sheet excel file with at least two columns: 'Topic' and 'Description' spelled that same way.")
+    uploaded_file_geography = st.file_uploader("Upload geographies file", type=["xlsx"], help="Upload a one sheet excel file with at least one column: 'Geography' spelled that same way.")
+    st.table(uploaded_file_topic_desc)
+    st.table(uploaded_file_geography)
 
 
     if uploaded_file_topic_desc is not None and uploaded_file_geography is not None:
-        df_topic_desc = pd.read_csv(uploaded_file_topic_desc)
-        df_geography = pd.read_csv(uploaded_file_geography)
+        df_topic_desc = pd.read_excel(uploaded_file_topic_desc)
+        df_geography = pd.read_excel(uploaded_file_geography)
         expected_columns_topic_desc = ["Topic", "Description"]
         expected_columns_geography = ["Geography"]
         columns_are_checked_topic_desc = all([elt in df_topic_desc for elt in expected_columns_topic_desc ])
